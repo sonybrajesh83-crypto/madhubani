@@ -43,6 +43,8 @@ next-env.d.ts
 
 /src/generated/prisma
 .artifacts/
+# Keep a seeded SQLite DB for Vercel serverless deploys
 prisma/*.db
+!prisma/dev.db
 public/uploads/*
 !public/uploads/.gitkeep

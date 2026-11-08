@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  outputFileTracingIncludes: {
+    "/**": ["./prisma/dev.db", "./prisma/schema.prisma"],
+  },
+  images: {
+    remotePatterns: [],
+  },
 };
 
 export default nextConfig;
