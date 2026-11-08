@@ -1,5 +1,11 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
+type CustomerRow = Prisma.UserGetPayload<{
+  include: {
+    _count: { select: { orders: true; conversations: true } };
+  };
+}>;
 
 export default async function AdminCustomersPage() {
   const customers = await prisma.user.findMany({
@@ -25,7 +31,7 @@ export default async function AdminCustomersPage() {
             </tr>
           </thead>
           <tbody>
-            {customers.map((customer) => (
+            {customers.map((customer: CustomerRow) => (
               <tr key={customer.id} className="border-b border-[var(--ink)]/5">
                 <td className="px-4 py-3 font-medium">{customer.id}</td>
                 <td className="px-4 py-3">{customer.name}</td>

@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AmazonBuyBox } from "@/components/store/amazonBuyBox";
@@ -10,6 +11,10 @@ import { parseJsonArray } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
 type Props = { params: Promise<{ id: string }> };
+
+type ProductReview = Prisma.ReviewGetPayload<{
+  include: { customer: { select: { name: true } } };
+}>;
 
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
@@ -37,8 +42,10 @@ export default async function ProductPage({ params }: Props) {
 
   const avg =
     product.reviews.length > 0
-      ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
-        product.reviews.length
+      ? product.reviews.reduce(
+          (sum: number, review: ProductReview) => sum + review.rating,
+          0,
+        ) / product.reviews.length
       : 0;
 
   return (
@@ -116,7 +123,7 @@ export default async function ProductPage({ params }: Props) {
               Collector reviews
             </h2>
             <div className="mt-6 space-y-4">
-              {product.reviews.map((review) => (
+              {product.reviews.map((review: ProductReview) => (
                 <article
                   key={review.id}
                   className="border border-black/10 bg-white p-5"

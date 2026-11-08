@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/store/logoutButton";
@@ -5,6 +6,9 @@ import { formatInr } from "@/lib/format";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+type OrderWithItems = Prisma.OrderGetPayload<{
+  include: { items: { include: { product: true } } };
+}>;
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
@@ -43,7 +47,7 @@ export default async function AccountPage() {
 
       <section className="mt-10 space-y-4">
         <h2 className="font-[family-name:var(--font-display)] text-2xl">Recent orders</h2>
-        {orders.map((order) => (
+        {orders.map((order: OrderWithItems) => (
           <article key={order.id} className="border border-[var(--ink)]/10 bg-white p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
@@ -55,7 +59,7 @@ export default async function AccountPage() {
               <div className="font-semibold">{formatInr(order.total)}</div>
             </div>
             <ul className="mt-3 space-y-1 text-sm text-[var(--ink)]/70">
-              {order.items.map((item) => (
+              {order.items.map((item: OrderWithItems["items"][number]) => (
                 <li key={item.id}>
                   {item.product.name} × {item.quantity}
                 </li>

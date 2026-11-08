@@ -1,3 +1,4 @@
+import type { Category, Product } from "@prisma/client";
 import Link from "next/link";
 import { CollectionHeader } from "@/components/store/collectionHeader";
 import { ProductCard } from "@/components/store/productCard";
@@ -64,7 +65,7 @@ export default async function ShopPage({ searchParams }: Props) {
           <FilterChip href="/shop?type=PAINTING" active={type === "PAINTING"}>
             Paintings
           </FilterChip>
-          {categories.map((category) => (
+          {categories.map((category: Category) => (
             <FilterChip
               key={category.id}
               href={`/shop?category=${category.slug}`}
@@ -105,7 +106,7 @@ export default async function ShopPage({ searchParams }: Props) {
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-x-6 gap-y-12 px-4 py-12 sm:grid-cols-2 lg:grid-cols-3 md:px-8">
-        {products.map((product, index) => (
+        {products.map((product: Product, index: number) => (
           <ProductCard
             key={product.id}
             id={product.id}

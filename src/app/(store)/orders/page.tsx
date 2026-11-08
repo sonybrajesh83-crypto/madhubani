@@ -1,9 +1,13 @@
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { formatInr } from "@/lib/format";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+type OrderWithItems = Prisma.OrderGetPayload<{
+  include: { items: { include: { product: true } } };
+}>;
 
 type Props = { searchParams: Promise<{ success?: string }> };
 
@@ -27,7 +31,7 @@ export default async function OrdersPage({ searchParams }: Props) {
         </div>
       ) : null}
       <div className="mt-8 space-y-4">
-        {orders.map((order) => (
+        {orders.map((order: OrderWithItems) => (
           <article key={order.id} className="border border-[var(--ink)]/10 bg-white p-5">
             <div className="flex flex-wrap justify-between gap-2">
               <div>
@@ -39,7 +43,7 @@ export default async function OrdersPage({ searchParams }: Props) {
               <div className="font-semibold">{formatInr(order.total)}</div>
             </div>
             <ul className="mt-3 text-sm text-[var(--ink)]/70">
-              {order.items.map((item) => (
+              {order.items.map((item: OrderWithItems["items"][number]) => (
                 <li key={item.id}>
                   <Link href={`/product/${item.productId}`} className="hover:text-[var(--vermillion)]">
                     {item.product.name}

@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
-import type { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import type { Role } from "@/lib/roles";
 
 const COOKIE_NAME = "smp_session";
 

@@ -1,3 +1,4 @@
+import type { Product } from "@prisma/client";
 import { HomeCtaBand } from "@/components/store/homeCtaBand";
 import { HomeFeaturedWall } from "@/components/store/homeFeaturedWall";
 import { HomeGalleryRail } from "@/components/store/homeGalleryRail";
@@ -11,7 +12,7 @@ export default async function HomePage() {
     orderBy: [{ featured: "desc" }, { price: "desc" }],
   });
 
-  const wall = products.slice(0, 4).map((product) => ({
+  const wall = products.slice(0, 4).map((product: Product) => ({
     id: product.id,
     name: product.name,
     tagline: product.tagline,
@@ -19,7 +20,7 @@ export default async function HomePage() {
     imageUrl: product.imageUrl,
   }));
 
-  const rail = products.map((product) => ({
+  const rail = products.map((product: Product) => ({
     id: product.id,
     name: product.name,
     price: product.price,
@@ -27,10 +28,12 @@ export default async function HomePage() {
     tagline: product.tagline,
   }));
 
-  const spotlightA = products.find((p) => p.name.includes("Ganesha")) || products[0];
+  const spotlightA =
+    products.find((p: Product) => p.name.includes("Ganesha")) || products[0];
   const spotlightB =
-    products.find((p) => p.name.includes("Doli") || p.name.includes("Vivah")) ||
-    products[1];
+    products.find(
+      (p: Product) => p.name.includes("Doli") || p.name.includes("Vivah"),
+    ) || products[1];
 
   return (
     <>

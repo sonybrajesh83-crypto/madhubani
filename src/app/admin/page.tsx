@@ -1,7 +1,11 @@
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { formatInr } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
+type RecentOrder = Prisma.OrderGetPayload<{
+  include: { customer: true };
+}>;
 
 export default async function AdminDashboardPage() {
   const [productCount, orderCount, customerCount, openChats, recentOrders] =
@@ -50,7 +54,7 @@ export default async function AdminDashboardPage() {
       <section className="mt-10 border border-[var(--ink)]/10 bg-white p-5">
         <h2 className="font-[family-name:var(--font-display)] text-2xl">Latest orders</h2>
         <div className="mt-4 space-y-3">
-          {recentOrders.map((order) => (
+          {recentOrders.map((order: RecentOrder) => (
             <div
               key={order.id}
               className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--ink)]/5 pb-3 text-sm"
