@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum ProductType {
+  PAINTING
+  SAREE
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum ConversationStatus {
+  OPEN
+  CLOSED
+}
+
+model User {
+  id           String   @id
+  email        String   @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         Role     @default(CUSTOMER)
+  address      String?
+  city         String?
+  state        String?
+  pincode      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders        Order[]
+  reviews       Review[]
+  conversations Conversation[]
+  messages      Message[]
+}
+
+model Category {
+  id          String    @id
+  name        String
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  products    Product[]
+}
+
+model Product {
+  id              String      @id
+  name            String
+  slug            String      @unique
+  description     String
+  longDescription String?
+  price           Int
+  compareAtPrice  Int?
+  categoryId      String
+  category        Category    @relation(fields: [categoryId], references: [id])
+  type            ProductType
+  motifKey        String
+  imageUrl        String?
+  imagesJson      String      @default("[]")
+  tagline         String?
+  tagsJson        String      @default("[]")
+  sizesJson       String      @default("[]")
+  framesJson      String      @default("[]")
+  colorsJson      String      @default("[]")
+  bordersJson     String      @default("[]")
+  stock           Int         @default(12)
+  featured        Boolean     @default(false)
+  customizable    Boolean     @default(true)
+  artistNote      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  reviews    Review[]
+  orderItems OrderItem[]
+}
+
+model Order {
+  id               String        @id
+  customerId       String
+  customer         User          @relation(fields: [customerId], references: [id])
+  status           OrderStatus   @default(PENDING)
+  total            Int
+  shippingName     String
+  shippingAddress  String
+  shippingCity     String
+  shippingState    String
+  shippingPincode  String
+  phone            String
+  paymentId        String?
+  razorpayOrderId  String?
+  paymentStatus    PaymentStatus @default(PENDING)
+  notes            String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id              String  @id @default(cuid())
+  orderId         String
+  order           Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product @relation(fields: [productId], references: [id])
+  quantity        Int
+  unitPrice       Int
+  customizationJson String @default("{}")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  customerId String
+  customer   User     @relation(fields: [customerId], references: [id])
+  rating     Int
+  title      String
+  body       String
+  createdAt  DateTime @default(now())
+
+  @@unique([productId, customerId])
+}
+
+model Conversation {
+  id         String             @id @default(cuid())
+  customerId String
+  customer   User               @relation(fields: [customerId], references: [id])
+  subject    String?
+  status     ConversationStatus @default(OPEN)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  messages Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  body           String
+  createdAt      DateTime     @default(now())
+}
